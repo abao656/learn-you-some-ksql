@@ -1,353 +1,51 @@
-### 主要特性
+# KSQL-IDE
 
-- 支持“标准”Markdown / CommonMark和Github风格的语法，也可变身为代码编辑器；
-- 支持实时预览、图片（跨域）上传、预格式文本/代码/表格插入、代码折叠、搜索替换、只读模式、自定义样式主题和多语言语法高亮等功能；
-- 支持ToC（Table of Contents）、Emoji表情、Task lists、@链接等Markdown扩展语法；
-- 支持TeX科学公式（基于KaTeX）、流程图 Flowchart 和 时序图 Sequence Diagram;
-- 支持识别和解析HTML标签，并且支持自定义过滤标签解析，具有可靠的安全性和几乎无限的扩展性；
-- 支持 AMD / CMD 模块化加载（支持 Require.js & Sea.js），并且支持自定义扩展插件；
-- 兼容主流的浏览器（IE8+）和Zepto.js，且支持iPad等平板设备；
-- 支持自定义主题样式；
+KSQL查询结果图形化展示项目
 
-# Editor.md
+## 什么是KSQL
 
-![](https://pandao.github.io/editor.md/images/logos/editormd-logo-180x180.png)
+[KSQL](https://www.confluent.io/product/ksql/)可以通过编写SQL语句的方式去执行kafka的[stream api](https://kafka.apache.org/documentation/streams/)所做的查询，分析，聚合等操作。使用KSQL，可以降低流式处理的门槛。
 
-![](https://img.shields.io/github/stars/pandao/editor.md.svg) ![](https://img.shields.io/github/forks/pandao/editor.md.svg) ![](https://img.shields.io/github/tag/pandao/editor.md.svg) ![](https://img.shields.io/github/release/pandao/editor.md.svg) ![](https://img.shields.io/github/issues/pandao/editor.md.svg) ![](https://img.shields.io/bower/v/editor.md.svg)
+一般来说，为处理Kafka里的数据，我们需要coding，调用kafka的stream api，而这部分工作往往需要不少的时间来编写和调试程序。
+而这个方案的问题在于对于数据分析师来说，也许想到了一个数据分析方案，需要马上来做验证，显然编程所花的时间太多了，而且分析师们的查询大多是随机的(ad-hoc)，于是我们需要一个轻量级，马上能直观的看到结果的工具，那么KSQL就可以轻而易举的做到这一点。
 
-**目录 (Table of Contents)**
+### KSQL适用于什么？
 
-[TOCM]
+- 实时监控，实时分析
+- 实时安全和异常检测
+- 实时数据的连接聚合查询
 
-[TOC]
+### KSQL的语法
 
-# Heading 1
-## Heading 2
-### Heading 3
-#### Heading 4
-##### Heading 5
-###### Heading 6
-# Heading 1 link [Heading link](https://github.com/pandao/editor.md "Heading link")
-## Heading 2 link [Heading link](https://github.com/pandao/editor.md "Heading link")
-### Heading 3 link [Heading link](https://github.com/pandao/editor.md "Heading link")
-#### Heading 4 link [Heading link](https://github.com/pandao/editor.md "Heading link") Heading link [Heading link](https://github.com/pandao/editor.md "Heading link")
-##### Heading 5 link [Heading link](https://github.com/pandao/editor.md "Heading link")
-###### Heading 6 link [Heading link](https://github.com/pandao/editor.md "Heading link")
+详情见[KSQL Reference](https://docs.confluent.io/current/ksql/docs/syntax-reference.html)
 
-#### 标题（用底线的形式）Heading (underline)
+## 什么是KSQL-IDE
 
-This is an H1
-=============
+- [测试环境](http://ksql-ide-staging.guazi-cloud.com/home)
+- [生产环境](http://ksql-ide.guazi-apps.com/home)
 
-This is an H2
--------------
+目前来说，KSQL还在飞速的发展中，其本身只提供了一个默认的控制台终端，使用起来成本太高，依赖过多，编写SQL时有诸多不便，为此我们开发了一套工具来管理KSQL及其依赖，通过web提供一种更加便捷、高效的方式来使用KSQL，同时也提供了一些对Kafka的相关功能操作的封装。
 
-### 字符效果和横线等
-                
-----
+### KSQL-IDE的功能
 
-~~删除线~~ <s>删除线（开启识别HTML标签时）</s>
-*斜体字*      _斜体字_
-**粗体**  __粗体__
-***粗斜体*** ___粗斜体___
+- [直接在web页面上编写执行SQL](/guide/ksql-ui.md)
+- 历史SQL的管理
+- ad-hoc查询的图形化展示(*)
+- 提交SQL到测试，线上环境(*)
+- [topic的数据的查看、发送](/guide/topic.md)
 
-上标：X<sub>2</sub>，下标：O<sup>2</sup>
+TOPICS查看界面主要提供"了解详情、获取schema信息、查看罪行数据和发送测试数据"的功能。了解详情是获取指定topic的元数据信息，返回一个json数据，主要包括 name、configs、partitions。在每个partition显示所属分区信息、broker ID、分区副本列表等信息。获取schema功能可以将每个topic的schema信息展示出来，可以很清晰的了解注册schema数据的格式。查看最新数据功能提供了指定topic的消息队列消费每一条消息的基本信息，包括所属partition、key、offset和真实消费数据。在这个功能里提供了一个开关键，打开点解接收最新数据时，如果有生产者产生数据就可以看到消费生产的数据，如果关闭接收最新数据，即使有新的数据产生也无法消费。发送测试数据功能，主要向指定tipic发送测试数据，所发送的测试数据必需也topic的schema格式相匹配，否则会报错。在填写发送数据的时候，提供了三种方式：直接写Json数据、表单填写数据和vue-json-editor组件生成数据，这三种方式都可以发送测试数据。
+- topic数据同步到elastic(*)
+- schema的查看
 
-**缩写(同HTML的abbr标签)**
+## Table and Stream 
 
-> 即更长的单词或短语的缩写形式，前提是开启识别HTML标签时，已默认开启
+- [描述](/guide/table-stream.md)
 
-The <abbr title="Hyper Text Markup Language">HTML</abbr> specification is maintained by the <abbr title="World Wide Web Consortium">W3C</abbr>.
+## 权限控制
 
-### 引用 Blockquotes
+为了避免在测试阶段产生大量topic，所以加入了权限控制。用户可以基于topic创建STREAM和TABLE，然后通过执行查询(SELECT)语句实现连接、聚合、时间窗口等业务需求，但是不能够将结果回写到kafka的topic。也就是说没有“CREATE STREAM/TABLE AS SELECT ...”的权限。
 
-> 引用文本 Blockquotes
+## 附录
 
-引用的行内混合 Blockquotes
-                    
-> 引用：如果想要插入空白换行`即<br />标签`，在插入处先键入两个以上的空格然后回车即可，[普通链接](http://localhost/)。
-
-### 锚点与链接 Links
-
-[普通链接](http://localhost/)
-
-[普通链接带标题](http://localhost/ "普通链接带标题")
-
-直接链接：<https://github.com>
-
-[锚点链接][anchor-id] 
-
-[anchor-id]: http://www.this-anchor-link.com/
-
-GFM a-tail link @pandao
-
-> @pandao
-
-### 多语言代码高亮 Codes
-
-#### 行内代码 Inline code
-
-执行命令：`npm install marked`
-
-#### 缩进风格
-
-即缩进四个空格，也做为实现类似`<pre>`预格式化文本(Preformatted Text)的功能。
-
-    <?php
-        echo "Hello world!";
-    ?>
-    
-预格式化文本：
-
-    | First Header  | Second Header |
-    | ------------- | ------------- |
-    | Content Cell  | Content Cell  |
-    | Content Cell  | Content Cell  |
-
-#### JS代码　
-
-```javascript
-function test(){
-	console.log("Hello world!");
-}
- 
-(function(){
-    var box = function(){
-        return box.fn.init();
-    };
-
-    box.prototype = box.fn = {
-        init : function(){
-            console.log('box.init()');
-
-			return this;
-        },
-
-		add : function(str){
-			alert("add", str);
-
-			return this;
-		},
-
-		remove : function(str){
-			alert("remove", str);
-
-			return this;
-		}
-    };
-    
-    box.fn.init.prototype = box.fn;
-    
-    window.box =box;
-})();
-
-var testBox = box();
-testBox.add("jQuery").remove("jQuery");
-```
-
-#### HTML代码 HTML codes
-
-```html
-<!DOCTYPE html>
-<html>
-    <head>
-        <mate charest="utf-8" />
-        <title>Hello world!</title>
-    </head>
-    <body>
-        <h1>Hello world!</h1>
-    </body>
-</html>
-```
-
-### 图片 Images
-
-Image:
-
-![](https://pandao.github.io/editor.md/examples/images/4.jpg)
-
-> Follow your heart.
-
-![](https://pandao.github.io/editor.md/examples/images/8.jpg)
-
-> 图为：厦门白城沙滩
-
-图片加链接 (Image + Link)：
-
-[![](https://pandao.github.io/editor.md/examples/images/7.jpg)](https://pandao.github.io/editor.md/examples/images/7.jpg "李健首张专辑《似水流年》封面")
-
-> 图为：李健首张专辑《似水流年》封面
-                
-----
-
-### 列表 Lists
-
-#### 无序列表（减号）Unordered Lists (-)
-                
-- 列表一
-- 列表二
-- 列表三
-     
-#### 无序列表（星号）Unordered Lists (*)
-
-* 列表一
-* 列表二
-* 列表三
-
-#### 无序列表（加号和嵌套）Unordered Lists (+)
-                
-+ 列表一
-+ 列表二
-    + 列表二-1
-    + 列表二-2
-    + 列表二-3
-+ 列表三
-    * 列表一
-    * 列表二
-    * 列表三
-
-#### 有序列表 Ordered Lists (-)
-                
-1. 第一行
-2. 第二行
-3. 第三行
-
-#### GFM task list
-
-- [x] GFM task list 1
-- [x] GFM task list 2
-- [ ] GFM task list 3
-    - [ ] GFM task list 3-1
-    - [ ] GFM task list 3-2
-    - [ ] GFM task list 3-3
-- [ ] GFM task list 4
-    - [ ] GFM task list 4-1
-    - [ ] GFM task list 4-2
-                
-----
-                    
-### 绘制表格 Tables
-
-| 项目        | 价格   |  数量  |
-| --------   | -----:  | :----:  |
-| 计算机      | $1600   |   5     |
-| 手机        |   $12   |   12   |
-| 管线        |    $1    |  234  |
-                    
-First Header  | Second Header
-------------- | -------------
-Content Cell  | Content Cell
-Content Cell  | Content Cell 
-
-| First Header  | Second Header |
-| ------------- | ------------- |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
-
-| Function name | Description                    |
-| ------------- | ------------------------------ |
-| `help()`      | Display the help window.       |
-| `destroy()`   | **Destroy your computer!**     |
-
-| Left-Aligned  | Center Aligned  | Right Aligned |
-| :------------ |:---------------:| -----:|
-| col 3 is      | some wordy text | $1600 |
-| col 2 is      | centered        |   $12 |
-| zebra stripes | are neat        |    $1 |
-
-| Item      | Value |
-| --------- | -----:|
-| Computer  | $1600 |
-| Phone     |   $12 |
-| Pipe      |    $1 |
-                
-----
-
-#### 特殊符号 HTML Entities Codes
-
-&copy; &  &uml; &trade; &iexcl; &pound;
-&amp; &lt; &gt; &yen; &euro; &reg; &plusmn; &para; &sect; &brvbar; &macr; &laquo; &middot; 
-
-X&sup2; Y&sup3; &frac34; &frac14;  &times;  &divide;   &raquo;
-
-18&ordm;C  &quot;  &apos;
-
-### Emoji表情 :smiley:
-
-> Blockquotes :star:
-
-#### GFM task lists & Emoji & fontAwesome icon emoji & editormd logo emoji :editormd-logo-5x:
-
-- [x] :smiley: @mentions, :smiley: #refs, [links](), **formatting**, and <del>tags</del> supported :editormd-logo:;
-- [x] list syntax required (any unordered or ordered list supported) :editormd-logo-3x:;
-- [x] [ ] :smiley: this is a complete item :smiley:;
-- [ ] []this is an incomplete item [test link](#) :fa-star: @pandao; 
-- [ ] [ ]this is an incomplete item :fa-star: :fa-gear:;
-    - [ ] :smiley: this is an incomplete item [test link](#) :fa-star: :fa-gear:;
-    - [ ] :smiley: this is  :fa-star: :fa-gear: an incomplete item [test link](#);
- 
-#### 反斜杠 Escape
-
-\*literal asterisks\*
-            
-### 科学公式 TeX(KaTeX)
-                    
-$$E=mc^2$$
-
-行内的公式$$E=mc^2$$行内的公式，行内的$$E=mc^2$$公式。
-
-$$\(\sqrt{3x-1}+(1+x)^2\)$$
-                    
-$$\sin(\alpha)^{\theta}=\sum_{i=0}^{n}(x^i + \cos(f))$$
-
-多行公式：
-
-```math
-\displaystyle
-\left( \sum\_{k=1}^n a\_k b\_k \right)^2
-\leq
-\left( \sum\_{k=1}^n a\_k^2 \right)
-\left( \sum\_{k=1}^n b\_k^2 \right)
-```
-
-```katex
-\displaystyle 
-    \frac{1}{
-        \Bigl(\sqrt{\phi \sqrt{5}}-\phi\Bigr) e^{
-        \frac25 \pi}} = 1+\frac{e^{-2\pi}} {1+\frac{e^{-4\pi}} {
-        1+\frac{e^{-6\pi}}
-        {1+\frac{e^{-8\pi}}
-         {1+\cdots} }
-        } 
-    }
-```
-
-```latex
-f(x) = \int_{-\infty}^\infty
-    \hat f(\xi)\,e^{2 \pi i \xi x}
-    \,d\xi
-```
-                
-### 绘制流程图 Flowchart
-
-```flow
-st=>start: 用户登陆
-op=>operation: 登陆操作
-cond=>condition: 登陆成功 Yes or No?
-e=>end: 进入后台
-
-st->op->cond
-cond(yes)->e
-cond(no)->op
-```
-                    
-### 绘制序列图 Sequence Diagram
-                    
-```seq
-Andrew->China: Says Hello 
-Note right of China: China thinks\nabout it 
-China-->Andrew: How are you? 
-Andrew->>China: I am good thanks!
-```
-
-### End
+[stream platform](http://cwiki.guazi-corp.com/display/xn/Stream+Platform)
