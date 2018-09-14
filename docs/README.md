@@ -1,0 +1,9 @@
+# Join
+Kafka Stream的join是基于Key的，只有两个Message的Key相同才能join到一起。
+为什么这样设计呢，根据recode中的字段进行join岂不是更灵活？原因主要有两点
+- 1.Msg在topic中是顺序存储，读取也是顺序读取，不会对msg中的任何字段建立索引。但是Kafka Stream里会为KTable创建一个以Msg的Key作为键的Map结构，用于聚合或join。所以基于Key的join时间复杂度是O(1),而基于其他字段的Join时间复杂度是O(n)。
+- 2.为了实现高性能、高可用，Kafka Stream是以Map Reduce方式工作的。我们假设一个Topic有4个Partition，那么Kafka Stream会创建4个Task分别处理每个Partition的数据，这4个Task可能会运行在不同的实例。这种情况下的Join就要求本应该Join到一起的两个Msg必须分配到同一个Task。Task与Partition是对应的，所以就要求两个Msg的Partition是一致的。而Msg对Partition的Hash是基于Key的，只有基于Key的Join，才能保证本应Join到一起的两个Msg分配到相同的Task中。
+
+那么如果两个Topic的Key不一样如何Join呢？这就需要进行转换，举个例子如下
+
+## table join table
